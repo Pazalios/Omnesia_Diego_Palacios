@@ -5,8 +5,10 @@ class Expediente:
     REQUIRED_TYPES = ("DUA", "FACTURA", "PACKING")
     OPTIONAL_TYPES = ("TRANSPORTE", "CERTORIGEN")
 
-    def __init__(self, mrn: str) -> None:
+    def __init__(self, mrn: str, cliente: str, nif_cliente: str) -> None:
         self.mrn = mrn
+        self.cliente = cliente
+        self.nif_cliente = nif_cliente
         self.archivos_por_tipo: Dict[str, List[str]] = {
             "DUA": [],
             "FACTURA": [],
@@ -16,14 +18,17 @@ class Expediente:
         }
         self.archivos_otros_tipos: Dict[str, List[str]] = {}
 
-    def add_document(self, tipo: str, file_name: str) -> None:
-        if tipo in self.archivos_por_tipo:
+    def add_document(self, tipo: str, mrn: str, nif_cliente: str, file_name: str) -> None:
+        if tipo in self.archivos_por_tipo and mrn == self.mrn and nif_cliente == self.nif_cliente:
             self.archivos_por_tipo[tipo].append(file_name)
             return
 
-        if tipo not in self.archivos_otros_tipos:
-            self.archivos_otros_tipos[tipo] = []
-        self.archivos_otros_tipos[tipo].append(file_name)
+        if tipo not in self.archivos_por_tipo and mrn == self.mrn and nif_cliente == self.nif_cliente:
+            self.archivos_otros_tipos[tipo].append(file_name)
+            return
+        
+        if nif_cliente != self.nif_cliente:
+            raise ValueError(f"El NIF-CLIENTE, {nif_cliente}, del documento '{file_name}' no coincide con el NIF-CLIENTE del expediente '{self.nif_cliente}'.")
 
     def missing_required_types(self) -> List[str]:
         missing: List[str] = []
@@ -50,12 +55,13 @@ class Expediente:
 
     def to_dict(self) -> Dict[str, object]:
         data: Dict[str, object] = {
-            "mrn": self.mrn,
+            "MRN": self.mrn,
+            "CLIENTE": self.cliente,
+            "NIF-CLIENTE": self.nif_cliente,
             "archivos": self.archivos_por_tipo,
-            "completo": self.is_complete(),
             "estado": "completo" if self.is_complete() else "incompleto",
             "faltan": self.missing_required_types(),
-            "tipos_duplicados": self.duplicated_types(),
+            "archivos_duplicados": self.duplicated_types(),
         }
 
         if self.archivos_otros_tipos:
