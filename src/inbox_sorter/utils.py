@@ -124,7 +124,7 @@ def extract_expedientes(documents: List[Dict[str, Any]]) -> List[Expediente]:
             expediente.add_document(_normalize_document_type(tipo), mrn, nif_cliente, file_name)
         except ValueError as e:
             print(f"Error al agregar el documento '{file_name}': {e}")            
-            document[file_name] = {"Error": f"Documento no procesable, {e}"}
+            document[file_name][] = {"Error": f"Documento no procesable, {e}"}
 
     return sorted(expedientes_by_client.values(), key=lambda expediente: (expediente.cliente, expediente.nif_cliente, expediente.mrn))
 
