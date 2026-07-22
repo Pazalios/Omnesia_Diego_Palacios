@@ -10,7 +10,7 @@ from expediente import Expediente
 
 def read_inbox_documents(inbox_path: Union[str, Path]) -> List[Dict[str, Any]]:
     """
-    Lee todos los documentos de texto en el directorio de entrada y devuelve una lista de diccionarios
+    Reads all the documents in the inbox directory and parses the content of the documents
     """
     inbox_directory = Path(inbox_path)
     documents: List[Dict[str, Any]] = []
@@ -32,8 +32,11 @@ def read_inbox_documents(inbox_path: Union[str, Path]) -> List[Dict[str, Any]]:
                 if possible_field not in fields:
                     fields["ERRORES"].append(f"En este documento falta el campo {possible_field}")
 
-            if len(fields.get("MRN", "")) != 18:
-                fields["ERRORES"].append("En este documento el MRN no tiene el formato correcto")
+            if len(fields.get("MRN", "")) < 18:
+                fields["ERRORES"].append("En este documento el MRN no tiene el formato correcto, faltan caracteres")
+                continue
+            elif len(fields.get("MRN", "")) > 18:
+                fields["ERRORES"].append("En este documento el MRN no tiene el formato correcto, sobran caracteres")
                 continue
 
             documents.append({file_path.name: fields})
