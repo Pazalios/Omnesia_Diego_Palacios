@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # Import functions from utils.py
-from utils import *
+from .utils import *
 
 
 def main(inbox_path: Path, output_path: Path) -> None:
@@ -12,6 +12,7 @@ def main(inbox_path: Path, output_path: Path) -> None:
     """
     # Read documents from the inbox directory
     print(f"Leyendo archivo de la ruta de entrada: {inbox_path}")
+    print("Incidencias encontradas durante la lectura de documentos:\n")
     documents = read_inbox_documents(inbox_path)
     
     # If no documents are found 
@@ -21,11 +22,15 @@ def main(inbox_path: Path, output_path: Path) -> None:
         sys.exit(0)
     # If documents are found, process them and generate a report
     else:
-        print(f"Se encontraron {len(documents)} documentos en el directorio de entrada")
+        print(f"\nSe encontraron {len(documents)} documentos en el directorio de entrada")
+        print("Generando expedientes a partir de los documentos encontrados...\n Inciendias encontradas durante la generación de expedientes:\n")
         expedientes = extract_expedientes(documents)
-        print(f"Se generaron {len(expedientes)} expedientes a partir de los documentos encontrados")
+        print(f"\nSe generaron {len(expedientes)} expedientes a partir de los documentos encontrados\n")
         report_path = write_report(output_path, documents, expedientes, inbox_path)
+        print("--- PROCESO FINALIZADO ---")
         print(f"Informe generado en: {report_path}")
+        print(f"Consulta el informe para ver los archivos que requieren atención,los expedientes incompletos o con duplicados y los archivos renombrados.")
+        sys.exit(0)
 
 
 if __name__ == "__main__":
@@ -41,7 +46,7 @@ if __name__ == "__main__":
         print("Si no indicas rutas:")
         print("  - inbox por defecto: dataset/inbox")
         print("  - salida por defecto: test_output\n")
-        print("Para runear el test default, ejecuta: python3 src/run_sorter_default_test.py\n")
+        print("Para runear el test default, ejecuta: python3 -m tests.run_sorter_default_test\n")
         sys.exit(0)
 
     # Define default paths for inbox and output
